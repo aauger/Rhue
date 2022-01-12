@@ -1,14 +1,15 @@
-use std::{fs::File, env::args, io::Read};
+use std::{env::args, fs::File, io::Read};
 
 fn main() {
     let args: Vec<String> = args().collect();
-    let file = File::open(&args[0]);
+    println!("{}", &args[1]);
+    let file = File::open(&args[1]);
     let mut buf = String::new();
-    let value = match file {
+    let _ = match file {
         Ok(mut s_file) => s_file.read_to_string(&mut buf),
-        Err(_) => panic!("goodbye!"),
+        Err(_) => panic!("goodbye!")
     };
-    //value.ok().
+    println!("{}", buf);
 }
 
 #[test]
