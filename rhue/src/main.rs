@@ -14,7 +14,9 @@ fn main() -> Result<(), io::Error> {
     let _ = rule_file.read_to_string(&mut rule_file_text);
     let _ = program_file.read_to_string(&mut program_file_text);
 
-    println!("{}", rule_file_text);
+    println!("RULESET: ");
+    println!("{}\n\n", rule_file_text);
+    println!("PROGRAM: ");
     println!("{}", program_file_text);
 
     Ok(())
