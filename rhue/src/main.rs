@@ -21,8 +21,3 @@ fn main() -> Result<(), io::Error> {
 
     Ok(())
 }
-
-#[test]
-fn test_tests() {
-    assert_eq!(1, 1);
-}
