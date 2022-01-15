@@ -11,8 +11,8 @@ fn main() -> Result<(), io::Error> {
     let mut rule_file_text = String::new();
     let mut program_file_text = String::new();
     
-    let _ = rule_file.read_to_string(&mut rule_file_text);
-    let _ = program_file.read_to_string(&mut program_file_text);
+    rule_file.read_to_string(&mut rule_file_text)?;
+    program_file.read_to_string(&mut program_file_text)?;
 
     println!("RULESET: ");
     println!("{}\n\n", rule_file_text);
