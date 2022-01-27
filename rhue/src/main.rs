@@ -1,5 +1,8 @@
 use std::{env::args, fs::File, io::{Read, self}, result::Result};
 
+mod ruleset;
+use crate::ruleset::rule::Rule;
+
 fn main() -> Result<(), io::Error> {
     let args: Vec<String> = args().skip(1).collect();
     let rule_file_path = &args[0];
@@ -13,6 +16,11 @@ fn main() -> Result<(), io::Error> {
     
     rule_file.read_to_string(&mut rule_file_text)?;
     program_file.read_to_string(&mut program_file_text)?;
+
+    let test_rule: Rule = Rule::new("hello", "world");
+
+    println!("TEST RULE: ");
+    println!("{}: {}", test_rule.lhs, test_rule.rhs);
 
     println!("RULESET: ");
     println!("{}\n\n", rule_file_text);
