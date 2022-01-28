@@ -1,9 +1,11 @@
 use std::{env::args, fs::File, io::{Read, self}, result::Result};
 
 mod ruleset;
-use crate::ruleset::rule::Rule;
+use crate::ruleset::rule::{Rule};
+use rand::{thread_rng, prelude::ThreadRng};
 
 fn main() -> Result<(), io::Error> {
+    let rand: ThreadRng = thread_rng();
     let args: Vec<String> = args().skip(1).collect();
     let rule_file_path = &args[0];
     let program_file_path = &args[1];
@@ -17,15 +19,15 @@ fn main() -> Result<(), io::Error> {
     rule_file.read_to_string(&mut rule_file_text)?;
     program_file.read_to_string(&mut program_file_text)?;
 
-    let test_rule: Rule = Rule::new("hello", "world");
+    let rules = rule_file_text.split("\n").map(|rt| {
+        let rule_split: Vec<&str> = rt.split("::=").collect();
+        Rule::new(rule_split[0], rule_split[1])
+    });
 
-    println!("TEST RULE: ");
-    println!("{}: {}", test_rule.lhs, test_rule.rhs);
-
-    println!("RULESET: ");
-    println!("{}\n\n", rule_file_text);
-    println!("PROGRAM: ");
-    println!("{}", program_file_text);
+    println!("Loaded ruleset:\n");
+    for rule in rules {
+        println!("lhs: {}, rhs: {}", rule.lhs, rule.rhs);
+    }
 
     Ok(())
 }
