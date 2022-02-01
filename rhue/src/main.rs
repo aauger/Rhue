@@ -1,7 +1,7 @@
 use std::{env::args, fs::File, io::{Read, self}, result::Result};
 
 mod ruleset;
-use crate::ruleset::rule::{Rule};
+use crate::ruleset::rule::{Rule, RuleType};
 use rand::{thread_rng, prelude::ThreadRng};
 
 fn main() -> Result<(), io::Error> {
@@ -21,7 +21,7 @@ fn main() -> Result<(), io::Error> {
 
     let rules = rule_file_text.split("\n").map(|rt| {
         let rule_split: Vec<&str> = rt.split("::=").collect();
-        Rule::new(rule_split[0], rule_split[1])
+        Rule::new(rule_split[0], rule_split[1], RuleType::Replace)
     });
 
     println!("Loaded ruleset:\n");
