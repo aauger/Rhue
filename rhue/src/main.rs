@@ -21,12 +21,21 @@ fn main() -> Result<(), io::Error> {
 
     let rules = rule_file_text.split("\n").map(|rt| {
         let rule_split: Vec<&str> = rt.split("::=").collect();
-        Rule::new(rule_split[0], rule_split[1], RuleType::Replace)
+        let lhs = rule_split[0].trim();
+        let rhs = rule_split[1].trim();
+
+        let rule = match rhs {
+            a if a.starts_with(":::") => Rule::new(lhs, &rhs[3..], RuleType::Input),
+            a if a.starts_with("~") => Rule::new(lhs, &rhs[1..], RuleType::Print),
+            _ => Rule::new(lhs, rhs, RuleType::Replace)
+        };
+
+        rule
     });
 
     println!("Loaded ruleset:\n");
     for rule in rules {
-        println!("lhs: {}, rhs: {}", rule.lhs, rule.rhs);
+        println!("lhs: {}, rhs: {}, type: {:?}", rule.lhs, rule.rhs, rule.rule_type);
     }
 
     Ok(())

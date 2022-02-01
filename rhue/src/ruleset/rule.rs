@@ -2,7 +2,7 @@
 pub enum RuleType {
     Replace,
     Print,
-    Never
+    Input
 }
 
 #[derive(Debug)]
