@@ -19,14 +19,14 @@ fn main() -> Result<(), io::Error> {
     rule_file.read_to_string(&mut rule_file_text)?;
     program_file.read_to_string(&mut program_file_text)?;
 
-    let rules = rule_file_text.split("\n").map(|rt| {
+    let rules = rule_file_text.lines().map(|rt| {
         let rule_split: Vec<&str> = rt.split("::=").collect();
         let lhs = rule_split[0].trim();
         let rhs = rule_split[1].trim();
 
         let rule = match rhs {
             a if a.starts_with(":::") => Rule::new(lhs, &rhs[3..], RuleType::Input),
-            a if a.starts_with("~") => Rule::new(lhs, &rhs[1..], RuleType::Print),
+            a if a.starts_with('~') => Rule::new(lhs, &rhs[1..], RuleType::Print),
             _ => Rule::new(lhs, rhs, RuleType::Replace)
         };
 
