@@ -6,15 +6,12 @@ use std::{
 };
 
 mod ruleset;
-use rand::{prelude::ThreadRng, thread_rng, Rng};
 use ruleset::rule::{Rule, RuleType};
 use ruleset::rule_engine::RuleEngine;
 
-const DEBUG: bool = true;
-
 fn main() -> Result<(), io::Error> {
-    let mut rand: ThreadRng = thread_rng();
     let args: Vec<String> = args().skip(1).collect();
+
     let rule_file_path = &args[0];
     let program_file_path = &args[1];
 
@@ -34,42 +31,18 @@ fn main() -> Result<(), io::Error> {
             let lhs = rule_split[0].trim();
             let rhs = rule_split[1].trim();
 
-            let rule = match rhs {
+            match rhs {
                 a if a.starts_with(":::") => Rule::new(lhs, &rhs[3..], RuleType::Input),
                 a if a.starts_with('~') => Rule::new(lhs, &rhs[1..], RuleType::Print),
                 _ => Rule::new(lhs, rhs, RuleType::Replace),
-            };
-
-            rule
+            }
         })
         .collect::<Vec<Rule>>();
 
-    let rule_engine = RuleEngine::new(rules);
-    let mut program = program_file_text;
+    let mut rule_engine = RuleEngine::new(rules, program_file_text);
+    let evaluated_text = rule_engine.evaluate();
 
-    loop {
-        if DEBUG {
-            println!{"DEBUG: {}", program};
-        }
-        if !rule_engine.rules.keys().any(|k| program.contains(k)) {
-            break;
-        }
-        for (k, v) in &rule_engine.rules {
-            if program.contains(k) {
-                let rule = &v[rand.gen_range(0..v.len())];
-                match rule.rule_type {
-                    RuleType::Replace => program = program.replacen(rule.lhs, rule.rhs, 1),
-                    RuleType::Print => {
-                        println!("{}", rule.rhs);
-                        program = program.replacen(rule.lhs, "", 1);
-                    }
-                    RuleType::Input => todo!(),
-                }
-            }
-        }
-    }
-
-    println!("{}", program);
+    println!("{}", evaluated_text);
 
     Ok(())
 }
