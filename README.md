@@ -1,7 +1,7 @@
 # Rhue
 (pronounced /ro͞o/)
 
-A simple Rust thue interpreter, with some twists.
+A simple Rust thue interpreter, with some twists -- written as an excuse to explore Rust 2021 while learning with the Rust book and Rust By Example.
 
 ### Usage
 
