@@ -2,7 +2,6 @@ use crate::ruleset::rule::{Rule, RuleType};
 use rand::{thread_rng, Rng};
 use std::{
     collections::HashMap,
-    io::{self, BufRead},
 };
 
 const DEBUG: bool = false;
@@ -10,10 +9,13 @@ const DEBUG: bool = false;
 pub struct RuleEngine<'a> {
     pub rules: HashMap<&'a str, Vec<Rule<'a>>>,
     pub program: String,
+    pub print: &'a fn(&str) -> (),
+    pub input: &'a fn(&str) -> String,
 }
 
 impl<'a> RuleEngine<'a> {
-    pub fn new(rule_list: Vec<Rule<'a>>, program: String) -> Self {
+    pub fn new(rule_list: Vec<Rule<'a>>, program: String, print: &'a fn(&str), input: &'a fn(&str) -> String) -> Self
+    {
         let mut rules: HashMap<&'a str, Vec<Rule<'a>>> = HashMap::new();
         for rule in rule_list {
             if rules.contains_key(rule.lhs) {
@@ -24,8 +26,7 @@ impl<'a> RuleEngine<'a> {
                 rules.insert(rule.lhs, vec![rule]);
             }
         }
-
-        Self { rules, program }
+        Self { rules, program, print, input }
     }
 
     pub fn evaluate(&mut self) -> &str {
@@ -48,18 +49,12 @@ impl<'a> RuleEngine<'a> {
                             self.program = self.program.replacen(rule.lhs, rule.rhs, 1)
                         }
                         RuleType::Print => {
-                            print!("{}", rule.rhs);
+                            (self.print)(rule.rhs);
                             self.program = self.program.replacen(rule.lhs, "", 1);
                         }
                         RuleType::Input => {
-                            if !rule.rhs.is_empty() {
-                                println!("{}: ", rule.rhs);
-                            }
-                            let mut input = String::new();
-                            io::stdin()
-                                .lock()
-                                .read_line(&mut input)
-                                .expect("We should have had an input here");
+
+                            let input = (self.input)(rule.rhs);
                             self.program = self.program.replacen(rule.lhs, &input, 1);
                         }
                     }
