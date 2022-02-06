@@ -1,6 +1,9 @@
 use crate::ruleset::rule::{Rule, RuleType};
 use rand::{thread_rng, Rng};
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    io::{self, BufRead},
+};
 
 const DEBUG: bool = false;
 
@@ -28,12 +31,15 @@ impl<'a> RuleEngine<'a> {
     pub fn evaluate(&mut self) -> &str {
         let mut rand = thread_rng();
         loop {
+            // Show debug output when this is run with debug mode.
             if DEBUG {
                 println! {"DEBUG: {}", self.program};
             }
+            // Verify current program state has some lhs in it, or return final evaluation
             if !self.rules.keys().any(|k| self.program.contains(k)) {
                 break &self.program;
             }
+            // Evaluate `lhs`s found in program text
             for (k, v) in &self.rules {
                 if self.program.contains(k) {
                     let rule = &v[rand.gen_range(0..v.len())];
@@ -45,7 +51,17 @@ impl<'a> RuleEngine<'a> {
                             print!("{}", rule.rhs);
                             self.program = self.program.replacen(rule.lhs, "", 1);
                         }
-                        RuleType::Input => todo!(),
+                        RuleType::Input => {
+                            if !rule.rhs.is_empty() {
+                                println!("{}: ", rule.rhs);
+                            }
+                            let mut input = String::new();
+                            io::stdin()
+                                .lock()
+                                .read_line(&mut input)
+                                .expect("We should have had an input here");
+                            self.program = self.program.replacen(rule.lhs, &input, 1);
+                        }
                     }
                 }
             }

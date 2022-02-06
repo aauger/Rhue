@@ -5,3 +5,4 @@
 _0::=_
 _1++::=10
 __::=1
+a::=:::please enter a binary number surrounded by underscores to increment
