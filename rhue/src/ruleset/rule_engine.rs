@@ -1,8 +1,6 @@
 use crate::ruleset::rule::{Rule, RuleType};
 use rand::{thread_rng, Rng};
-use std::{
-    collections::HashMap,
-};
+use std::collections::HashMap;
 
 const DEBUG: bool = false;
 
@@ -14,8 +12,12 @@ pub struct RuleEngine<'a> {
 }
 
 impl<'a> RuleEngine<'a> {
-    pub fn new(rule_list: Vec<Rule<'a>>, program: String, print: &'a fn(&str), input: &'a fn(&str) -> String) -> Self
-    {
+    pub fn new(
+        rule_list: Vec<Rule<'a>>,
+        program: String,
+        print: &'a fn(&str),
+        input: &'a fn(&str) -> String,
+    ) -> Self {
         let mut rules: HashMap<&'a str, Vec<Rule<'a>>> = HashMap::new();
         for rule in rule_list {
             if rules.contains_key(rule.lhs) {
@@ -26,7 +28,7 @@ impl<'a> RuleEngine<'a> {
                 rules.insert(rule.lhs, vec![rule]);
             }
         }
-        Self { rules, program, print, input }
+        return Self { rules, program, print, input };
     }
 
     pub fn evaluate(&mut self) -> &str {
@@ -34,7 +36,7 @@ impl<'a> RuleEngine<'a> {
         loop {
             // Show debug output when this is run with debug mode.
             if DEBUG {
-                println! {"DEBUG: {}", self.program};
+                (self.print)(&self.program);
             }
             // Verify current program state has some lhs in it, or return final evaluation
             if !self.rules.keys().any(|k| self.program.contains(k)) {
@@ -46,14 +48,13 @@ impl<'a> RuleEngine<'a> {
                     let rule = &v[rand.gen_range(0..v.len())];
                     match rule.rule_type {
                         RuleType::Replace => {
-                            self.program = self.program.replacen(rule.lhs, rule.rhs, 1)
+                            self.program = self.program.replacen(rule.lhs, rule.rhs, 1);
                         }
                         RuleType::Print => {
                             (self.print)(rule.rhs);
                             self.program = self.program.replacen(rule.lhs, "", 1);
                         }
                         RuleType::Input => {
-
                             let input = (self.input)(rule.rhs);
                             self.program = self.program.replacen(rule.lhs, &input, 1);
                         }

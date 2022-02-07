@@ -55,10 +55,10 @@ fn main() -> Result<(), io::Error> {
         })
         .collect::<Vec<Rule>>();
 
-    let print_ptr = &(print as fn(&str));
-    let input_ptr = &(input as fn(&str) -> String);
+    let print_ptr: fn(&str) = print;
+    let input_ptr: fn(&str) -> String = input;
 
-    let mut rule_engine = RuleEngine::new(rules, program_file_text, print_ptr, input_ptr);
+    let mut rule_engine = RuleEngine::new(rules, program_file_text, &print_ptr, &input_ptr);
     let evaluated_text = rule_engine.evaluate();
 
     println!("{}", evaluated_text);

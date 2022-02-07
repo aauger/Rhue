@@ -13,7 +13,7 @@ pub struct Rule<'a> {
 }
 
 impl<'a> Rule<'a> {
-    pub fn new(lhs: &'a str, rhs: &'a str, rule_type: RuleType) -> Self {
+    pub const fn new(lhs: &'a str, rhs: &'a str, rule_type: RuleType) -> Self {
         Self { lhs, rhs, rule_type }
     }
 }
