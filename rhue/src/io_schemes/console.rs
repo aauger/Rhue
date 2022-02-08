@@ -1,9 +1,9 @@
+use crate::ruleset::rule_engine::EngineIoScheme;
 use std::io::{self, BufRead};
-use crate::ruleset::rule_engine::RuleFuncs;
 
 pub struct ConsoleScheme;
 
-impl RuleFuncs for ConsoleScheme {
+impl EngineIoScheme for ConsoleScheme {
     fn print(output: &str) {
         println!("{}", output);
     }

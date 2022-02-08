@@ -45,7 +45,7 @@ fn main() -> Result<(), io::Error> {
         })
         .collect::<Vec<Rule>>();
 
-    let mut rule_engine = RuleEngine::new(rules, program_file_text, ConsoleScheme);
+    let mut rule_engine: RuleEngine<ConsoleScheme> = RuleEngine::new(rules, program_file_text);
     let evaluated_text = rule_engine.evaluate();
 
     println!("{}", evaluated_text);

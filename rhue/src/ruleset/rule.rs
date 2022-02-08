@@ -14,6 +14,6 @@ pub struct Rule {
 
 impl Rule {
     pub fn new(lhs: &str, rhs: &str, rule_type: RuleType) -> Self {
-        Self { lhs: lhs.to_owned(), rhs: rhs.to_owned(), rule_type }
+        Self { lhs: lhs.into(), rhs: rhs.into(), rule_type }
     }
 }
