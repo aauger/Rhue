@@ -1,29 +1,19 @@
 use std::{
     env::args,
     fs::File,
-    io::{self, BufRead, Read},
+    io::{self, Read},
     result::Result,
 };
 
 mod ruleset;
-use ruleset::rule::{Rule, RuleType};
 use ruleset::rule_engine::RuleEngine;
+use ruleset::{
+    rule::{Rule, RuleType}
+};
 
-fn print(output: &str) {
-    println!("{}", output);
-}
+mod io_schemes;
 
-fn input(prompt: &str) -> String {
-    if !prompt.is_empty() {
-        println!("{}", prompt);
-    }
-    let mut input = String::new();
-    io::stdin()
-        .lock()
-        .read_line(&mut input)
-        .expect("We should have had an input here");
-    input
-}
+use crate::io_schemes::console::ConsoleScheme;
 
 fn main() -> Result<(), io::Error> {
     let args: Vec<String> = args().skip(1).collect();
@@ -55,10 +45,7 @@ fn main() -> Result<(), io::Error> {
         })
         .collect::<Vec<Rule>>();
 
-    let print_ptr: fn(&str) = print;
-    let input_ptr: fn(&str) -> String = input;
-
-    let mut rule_engine = RuleEngine::new(rules, program_file_text, &print_ptr, &input_ptr);
+    let mut rule_engine: RuleEngine<ConsoleScheme> = RuleEngine::new(rules, program_file_text);
     let evaluated_text = rule_engine.evaluate();
 
     println!("{}", evaluated_text);
