@@ -6,23 +6,30 @@ use std::{
 };
 
 mod ruleset;
-use ruleset::rule::{Rule, RuleType};
 use ruleset::rule_engine::RuleEngine;
+use ruleset::{
+    rule::{Rule, RuleType},
+    rule_engine::RuleFuncs,
+};
 
-fn print(output: &str) {
-    println!("{}", output);
-}
+struct Console();
 
-fn input(prompt: &str) -> String {
-    if !prompt.is_empty() {
-        println!("{}", prompt);
+impl RuleFuncs for Console {
+    fn print(output: &str) {
+        println!("{}", output);
     }
-    let mut input = String::new();
-    io::stdin()
-        .lock()
-        .read_line(&mut input)
-        .expect("We should have had an input here");
-    input
+
+    fn input(prompt: &str) -> String {
+        if !prompt.is_empty() {
+            println!("{}", prompt);
+        }
+        let mut input = String::new();
+        io::stdin()
+            .lock()
+            .read_line(&mut input)
+            .expect("We should have had an input here");
+        input
+    }
 }
 
 fn main() -> Result<(), io::Error> {
@@ -55,10 +62,7 @@ fn main() -> Result<(), io::Error> {
         })
         .collect::<Vec<Rule>>();
 
-    let print_ptr: fn(&str) = print;
-    let input_ptr: fn(&str) -> String = input;
-
-    let mut rule_engine = RuleEngine::new(rules, program_file_text, &print_ptr, &input_ptr);
+    let mut rule_engine = RuleEngine::new(rules, program_file_text, Console());
     let evaluated_text = rule_engine.evaluate();
 
     println!("{}", evaluated_text);

@@ -1,34 +1,38 @@
 use crate::ruleset::rule::{Rule, RuleType};
 use rand::{thread_rng, Rng};
-use std::collections::HashMap;
+use std::{collections::HashMap};
 
 const DEBUG: bool = false;
 
-pub struct RuleEngine<'a> {
-    pub rules: HashMap<&'a str, Vec<Rule<'a>>>,
-    pub program: String,
-    pub print: &'a fn(&str) -> (),
-    pub input: &'a fn(&str) -> String,
+pub trait RuleFuncs {
+    fn print(output: &str);
+    fn input(prompt: &str) -> String;
 }
 
-impl<'a> RuleEngine<'a> {
-    pub fn new(
-        rule_list: Vec<Rule<'a>>,
-        program: String,
-        print: &'a fn(&str),
-        input: &'a fn(&str) -> String,
-    ) -> Self {
-        let mut rules: HashMap<&'a str, Vec<Rule<'a>>> = HashMap::new();
+pub struct RuleEngine<T: RuleFuncs> {
+    pub rules: HashMap<String, Vec<Rule>>,
+    pub program: String,
+    pub stub: T
+}
+
+impl<T: RuleFuncs> RuleEngine<T>
+{
+    pub fn new(rule_list: Vec<Rule>, program: String, stub: T) -> Self {
+        let mut rules: HashMap<String, Vec<Rule>> = HashMap::new();
         for rule in rule_list {
-            if rules.contains_key(rule.lhs) {
-                if let Some(vec) = rules.get_mut(rule.lhs) {
+            if rules.contains_key(&rule.lhs) {
+                if let Some(vec) = rules.get_mut(&rule.lhs) {
                     vec.push(rule);
                 }
             } else {
-                rules.insert(rule.lhs, vec![rule]);
+                rules.insert(rule.lhs.to_owned(), vec![rule]);
             }
         }
-        return Self { rules, program, print, input };
+        return Self {
+            rules,
+            program,
+            stub
+        };
     }
 
     pub fn evaluate(&mut self) -> &str {
@@ -36,7 +40,7 @@ impl<'a> RuleEngine<'a> {
         loop {
             // Show debug output when this is run with debug mode.
             if DEBUG {
-                (self.print)(&self.program);
+                <T as RuleFuncs>::print(&self.program);
             }
             // Verify current program state has some lhs in it, or return final evaluation
             if !self.rules.keys().any(|k| self.program.contains(k)) {
@@ -48,15 +52,15 @@ impl<'a> RuleEngine<'a> {
                     let rule = &v[rand.gen_range(0..v.len())];
                     match rule.rule_type {
                         RuleType::Replace => {
-                            self.program = self.program.replacen(rule.lhs, rule.rhs, 1);
+                            self.program = self.program.replacen(&rule.lhs, &rule.rhs, 1);
                         }
                         RuleType::Print => {
-                            (self.print)(rule.rhs);
-                            self.program = self.program.replacen(rule.lhs, "", 1);
+                            <T as RuleFuncs>::print(&rule.rhs);
+                            self.program = self.program.replacen(&rule.lhs, "", 1);
                         }
                         RuleType::Input => {
-                            let input = (self.input)(rule.rhs);
-                            self.program = self.program.replacen(rule.lhs, &input, 1);
+                            let input = <T as RuleFuncs>::input(&rule.rhs);
+                            self.program = self.program.replacen(&rule.lhs, &input, 1);
                         }
                     }
                 }
